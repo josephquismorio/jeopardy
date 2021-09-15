@@ -1,5 +1,6 @@
 import os
 import csv
+from posixpath import split
 import time
 import random
 from random import shuffle, choice
@@ -13,11 +14,12 @@ wager = 0
 def read(d, db, c, v, q, co):
     global bool
     global wager
+    print(f"Your earnings cash in at {score}$. \n")
     if db != "yes" and co != " - ":
-        print('(From', str(d).split(),') The category is', str(c), 'for $', int(v), '. \n')
+        print(f'(From {str(d).split()[0]}) The category is {c} for ${v}. \n')
         print(q, '\n')
     elif db != "yes" and co == " - ":
-        print('(From', str(d).split(),') The category is', str(c), 'for $', int(v), '. \n')
+        print(f'(From {str(d).split()[0]}) The category is {c} for ${v}. \n')
         print(q, '\n')
         print(co, '\n')
     elif db == "yes" and co != " - ":
@@ -25,36 +27,61 @@ def read(d, db, c, v, q, co):
         wager = input("Enter your wager: ")
         if wager == "!q":
             exit()
-        else:
+        elif score > 999:
             while int(wager) > score or int(wager) < 0:
                 wager = input("Enter a valid wager: ")
+                if wager == "!q":
+                    exit()
             if int(wager) == score:
                 print("A true daily double.\n")
-            print('(From', d,') The category is', c, 'for $', wager, '. \n')
+            print(f'(From {str(d).split()[0]}) The category is {c} for ${wager}. \n')
             print(q, '\n')
+        elif score <= 999:
+            while int(wager) > 1000 or int(wager) < 0:
+                wager = input("Enter a valid wager: ")
+                if wager == "!q":
+                    exit()
+            if int(wager) == score:
+                print("A true daily double.\n")
+            print(f'(From {str(d).split()[0]}) The category is {c} for ${wager}. \n')
+            print(q, '\n')
+
     elif db == "yes" and co == " - ":
         print("You've got today's daily double!\n")
         wager = input("Enter your wager: ")
         if wager == "!q":
             exit()
-        else:
+        elif score > 999:
             while int(wager) > score or int(wager) < 0:
                 wager = input("Enter a valid wager: ")
+                if wager == "!q":
+                    print(f"Your total earnings were {score}$.")
+                    exit()
             if int(wager) == score:
                 print("A true daily double.\n")
-            print('(From', d,') The category is', c, 'for $', wager, '. \n')
+            print(f'(From {str(d).split()[0]}) The category is {c} for ${wager}. \n')
             print(q, '\n')
             print(co, '\n')
+        elif score <= 999:
+            while int(wager) > 1000 or int(wager) < 0:
+                wager = input("Enter a valid wager: ")
+                if wager == "!q":
+                    print(f"Your total earnings were {score}$.")
+                    exit()
+            if int(wager) == score:
+                print("A true daily double.\n")
+            print(f'(From {str(d).split()[0]}) The category is {c} for ${wager}. \n')
+            print(q, '\n')
 
 def ask():
     global score
     global bool
     global wager
     while bool == True:
-        filesize = os.path.getsize('/your/dir/jeopardy.tsv')
+        filesize = os.path.getsize('/your/directory/jeopardy.tsv')
         offset = random.randrange(filesize)
 
-        f = open('/your/dir/jeopardy.tsv')
+        f = open('/your/directory/jeopardy.tsv')
         f.seek(offset)
         f.readline()
         q = f.readline()
@@ -67,7 +94,6 @@ def ask():
         question = categories[4]
         answer = categories[5]
         date = categories[6]
-        date.split()
 
         if len(q) == 0:
             f.seek(0)
@@ -81,7 +107,6 @@ def ask():
             question = categories[4]
             answer = categories[5]
             date = categories[6]
-            date.split()
 
         read(date, dbl, category, value, question, comments)
 
@@ -94,21 +119,25 @@ def ask():
             t -= 1
 
         val = input("Enter an answer: ")
-        ratio = fuzz.ratio(answer.lower(), val.lower())
+        print("\n")
+        while val == "":
+            val = input("Are you sure? Enter something: ")
+        ratio = fuzz.ratio(str(answer.lower().split()[0]), str(val.lower().split()[0]))
 
-        if 75 <= ratio <= 100:
-            print("Correct! The answer was indeed:", answer, "\n")
+        if 70 <= ratio <= 100:
+            print(f"Correct! The answer was indeed: {answer} \n")
             score+=int(value)
             score+=int(wager)
-            print("Your score is: ", score)
-        elif ratio < 75 and val != "!q":
-            print("Wrong! The answer was: ", answer, "\n")
+        elif ratio < 75 and val != "!q" and val != "!c":
+            print(f"Wrong! The answer was: {answer} \n")
             score-=int(value)
             score-=int(wager)
-            print("Your score is: ", score)
         elif val == "!q":
-            print("Your final score was: ", score)
+            print(f"The answer was: {answer} \n")
+            print(f"Your total earnings were {score}$.")
             bool = False
-        
+        elif val == "!c":
+            score = 0
+            print("Cleared score.")
 
 ask()
