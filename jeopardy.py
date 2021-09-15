@@ -51,10 +51,10 @@ def ask():
     global bool
     global wager
     while bool == True:
-        filesize = os.path.getsize('/Users/joeyquismorio/namethattunebot/cogs/jeopardy.tsv')
+        filesize = os.path.getsize('/your/dir/jeopardy.tsv')
         offset = random.randrange(filesize)
 
-        f = open('/Users/joeyquismorio/namethattunebot/cogs/jeopardy.tsv')
+        f = open('/your/dir/jeopardy.tsv')
         f.seek(offset)
         f.readline()
         q = f.readline()
